@@ -10,6 +10,8 @@ typedef struct{
     uint16_t x, y;
 } vector;
 
+uint16_t sine(uint16_t original_angle);
+
 
 
 #endif // SINGLELIB_H_INCLUDED
