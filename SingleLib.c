@@ -304,6 +304,10 @@ trigonometric sine(uint16_t original_angle){
 
     //I want to avoid pipeline breaks, so I'll check in which quadrant the angle is, based on a division by 4
     uint8_t divided = normalized_angle / (90 << 4);
-    uint8_t negativeCos = 
+    uint8_t negativeSin = divided>>1;
+    uint8_t negativeCos = ~((divided & 1) ^ negativeSin);
+    negativeSin ^= original_angle >> 15;                    //cos(-theta) = cos(theta), sin(-theta) = -sin(theta)
+    
+
 
 }
