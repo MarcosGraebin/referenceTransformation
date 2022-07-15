@@ -292,13 +292,18 @@ const uint16_t sine_16[] = {0,17,35,53,71,89,107,125,142,160,178,
 
 trigonometric sine(uint16_t original_angle){
     uint16_t positive_angle = (original_angle & 0b0111111111111111);
-    //TODO - how to calculate the module in a better in this architecture?
+    //TODO - how to calculate the module in a better way in this architecture?
     uint16_t normalized_angle = positive_angle % (360 << 5);
     uint16_t last_angle;
 
     //In this code, I changed an angle between 0 and 360 to an angle between 0 and 90
-    if(positive_angle > (180 << 5))
+    if(normalized_angle > (180 << 5))
         last_angle = normalized_angle - (180 << 5);
-    else if(positive_angle > (90 << 5))
+    if(last_angle > (90 << 5))
         last_angle = (180 << 5) - normalized_angle;
+
+    //I want to avoid pipeline breaks, so I'll check in which quadrant the angle is, based on a division by 4
+    uint8_t divided = normalized_angle / (90 << 4);
+    uint8_t negativeCos = 
+
 }
