@@ -4,13 +4,21 @@
 #include <stdint.h>
 #include <inttypes.h>
 //TODO - implement my own lobrary for the sine
-#include <math.h>
+//#include <math.h>
+
 
 typedef struct{
     uint16_t x, y;
 } vector;
 
-uint16_t sine(uint16_t original_angle);
+typedef struct{
+    uint16_t sine_fp;
+    uint16_t cossine_fp;
+}trigonometric;
+
+trigonometric sine(uint16_t original_angle);
+
+uint16_t sine_16_fp(uint16_t angle);
 
 
 

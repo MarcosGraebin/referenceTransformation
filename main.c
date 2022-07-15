@@ -12,7 +12,7 @@ int16_t change_to_2_complement(uint16_t number){
     return number;
 }
 
-vector futureMain(vector point, vector translate, uint16_t rotation){
+vector futureMain(vector point, vector translate, uint16_t angle){
 
     //TODO - maybe it is possible to do all these processes in fewer instructions using both ALUs
     point.x = (uint16_t) change_to_2_complement(point.x);
@@ -20,7 +20,7 @@ vector futureMain(vector point, vector translate, uint16_t rotation){
     translate.x = (uint16_t) change_to_2_complement(translate.x);
     translate.y = (uint16_t) change_to_2_complement(translate.y);
 
-    uint16_t sin = sine(rotation);
+    trigonometric rotation = sine(angle);
 
 
     return point;
