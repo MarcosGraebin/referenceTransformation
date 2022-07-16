@@ -22,8 +22,28 @@ vector futureMain(vector point, vector translate, uint16_t angle){
 
     trigonometric rotation = sine(angle);
 
+    vector translated;
+    translated.x = point.x - translate.x;       //Both operations can be done by a single instruction, as in page 45
+    translated.y = point.y - translate.y;
+    vector to_ret;
+    to_ret.x = translated.x*rotation.cossine_fp;    //This four lines can be done by 2 instructions as in page 45 and 611 (multiply and accumulate to accumulator). It'll be nice to use the debugger to check if it's possible to code it without or with the saturation
+    to_ret.y = translated.x*rotation.sine_fp;
+    to_ret.x -= translated.y*rotation.sine_fp;
+    to_ret.y += translated.y*rotation.cossine_fp;
 
-    return point;
+
+    //The sine and cossine returns values with 14 post-comma bits. It's necessary to eliminate this (even using the multiply and accumulate to accumulator instructions with saturation)
+    //As it has 1 barrel shifter, isn't possible to do both lines at once
+    to_ret.x = to_ret.x >> 14;
+    to_ret.y = to_ret.y >> 14;
+
+    //I'm not sure if this block of code must be here, or above the previous block. It would be nice to test it with a real device
+    if(to_ret.x < 0)
+        to_ret.x = (0 - to_ret.x) | (1 << 15);      //It's possible to use the ABS instruction to the first part of the operation
+    if(to_ret.y < 0)
+        to_ret.y = (0 - to_ret.y) | (1 << 15);
+
+    return to_ret;
 }
 
 int main(){
@@ -40,6 +60,15 @@ int main(){
     int16_t debug_cos   = change_to_2_complement(aux.cossine_fp);
 
     float seno = debug_sine / 32768.0, cosseno = debug_cos / 32768.0;
+
+
+
+    //test multiplication of 2 "negative unsigned ints"
+    uint16_t a, b;
+    a = (uint16_t) -1;
+    b = 4;
+    uint16_t c = a * b;
+
 
     return 0;
 
