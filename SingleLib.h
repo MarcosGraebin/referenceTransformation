@@ -16,10 +16,8 @@ typedef struct{
     uint16_t cossine_fp;
 }trigonometric;
 
+//TODO - will be better if it's an inline function
 trigonometric sine(uint16_t original_angle);
-
-uint16_t sine_16_fp(uint16_t angle);
-
 
 
 #endif // SINGLELIB_H_INCLUDED

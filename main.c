@@ -32,6 +32,16 @@ int main(){
     input.y = 2;
     translation.x = 1;
     translation.y = 2;
+    trigonometric aux;
 
-    futureMain(input, translation, 0);
+    aux = sine((uint16_t) (32768 + (700.9 * 32)));
+
+    int16_t debug_sine = change_to_2_complement(aux.sine_fp);
+    int16_t debug_cos   = change_to_2_complement(aux.cossine_fp);
+
+    float seno = debug_sine / 32768.0, cosseno = debug_cos / 32768.0;
+
+    return 0;
+
+    //futureMain(input, translation, 0);
 }

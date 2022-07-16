@@ -1,7 +1,7 @@
 #include "SingleLib.h"
 
-// Lookup table to avoid the use of math.h
-const uint16_t cos_16[] = {32768,32767,32767,32767,32767,32767,32767,32767,32767,32767,32767,32767,32767,32767,32767,32766,32766,32766,32766,32766,32766,
+// Lookup table to avoid the use of math.h, that has a float input
+const uint16_t cos_16[2880] = {32768,32767,32767,32767,32767,32767,32767,32767,32767,32767,32767,32767,32767,32767,32767,32766,32766,32766,32766,32766,32766,
 32765,32765,32765,32765,32764,32764,32764,32764,32763,32763,32763,32763,32762,32762,32762,32761,32761,32760,32760,32760,
 32759,32759,32758,32758,32758,32757,32757,32756,32756,32755,32755,32754,32754,32753,32753,32752,32752,32751,32751,32750,
 32749,32749,32748,32748,32747,32746,32746,32745,32744,32744,32743,32742,32742,32741,32740,32739,32739,32738,32737,32736,
@@ -147,23 +147,28 @@ const uint16_t cos_16[] = {32768,32767,32767,32767,32767,32767,32767,32767,32767
 339,321,303,285,268,250,232,214,196,178,160,142,125,107,89,71,53,35,17,0};
 
 trigonometric sine(uint16_t original_angle){
+
     uint16_t positive_angle = (original_angle & 0b0111111111111111);
     //TODO - how to calculate the module in a better way in this architecture?
     uint16_t normalized_angle = positive_angle % (360 << 5);
-    uint16_t last_angle;
+    uint16_t last_angle = normalized_angle;
 
     //In this code, I changed an angle between 0 and 360 to an angle between 0 and 90
     if(normalized_angle > (180 << 5))
         last_angle = normalized_angle - (180 << 5);
     if(last_angle > (90 << 5))
-        last_angle = (180 << 5) - normalized_angle;
+        last_angle = (180 << 5) - last_angle;
 
+    //TODO - check if CCES C can use bool variables
     //I want to avoid pipeline breaks, so I'll check in which quadrant the angle is, based on a division by 4
-    uint8_t divided = normalized_angle / (90 << 4);
+    uint8_t divided = normalized_angle / (90 << 5);
     uint8_t negativeSin = divided>>1;
-    uint8_t negativeCos = ~((divided & 1) ^ negativeSin);
+    uint8_t negativeCos = (divided & 1) ^ negativeSin;
     negativeSin ^= original_angle >> 15;                    //cos(-theta) = cos(theta), sin(-theta) = -sin(theta)
 
+    trigonometric to_return;
+    to_return.cossine_fp    = cos_16[last_angle] | (negativeCos << 15);
+    to_return.sine_fp       = cos_16[(90<<5)-last_angle] | (negativeSin << 15);       //trigonometric identity
 
-
+    return to_return;
 }
