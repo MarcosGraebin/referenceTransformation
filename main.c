@@ -3,7 +3,6 @@
 #include "SingleLib.h"
 
 //TODO - could we do that without a if?
-//TODO - check if the crosscore accept the inline keyword for the C language
 inline int16_t change_to_2_complement(uint16_t number){
     if(0b1000000000000000 & number){    //if the number is negative
         number = 0b0111111111111111 & number;
@@ -14,7 +13,6 @@ inline int16_t change_to_2_complement(uint16_t number){
 
 vector futureMain(vector point, vector translate, uint16_t angle){
 
-    //TODO - maybe it is possible to do all these processes in fewer instructions using both ALUs
     point.x     = (uint16_t) change_to_2_complement(point.x);
     point.y     = (uint16_t) change_to_2_complement(point.y);
     translate.x = (uint16_t) change_to_2_complement(translate.x);
@@ -26,7 +24,6 @@ vector futureMain(vector point, vector translate, uint16_t angle){
     
     point.x = point.x - translate.x;       //Both operations can be done by a single instruction, as in page 45
     point.y = point.y - translate.y;
-
     vector to_ret;
     to_ret.x = point.x*rotation.cossine_fp;    //This four lines can be done by 2 instructions as in page 45 and 611 (multiply and accumulate to accumulator). It'll be nice to use the debugger to check if it's possible to code it without or with the saturation
     to_ret.y = point.x*rotation.sine_fp;

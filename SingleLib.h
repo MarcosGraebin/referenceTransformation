@@ -3,9 +3,6 @@
 
 #include <stdint.h>
 #include <inttypes.h>
-//TODO - implement my own lobrary for the sine
-//#include <math.h>
-
 
 typedef struct{
     uint16_t x, y;
@@ -16,7 +13,6 @@ typedef struct{
     uint16_t cossine_fp;
 }trigonometric;
 
-//TODO - will be better if it's an inline function
 inline trigonometric sine(uint16_t original_angle);
 
 
