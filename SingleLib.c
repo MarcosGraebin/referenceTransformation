@@ -146,20 +146,19 @@ const uint16_t cos_16[2881] = {16384,16383,16383,16383,16383,16383,16383,16383,1
 348,339,330,321,312,303,294,285,277,268,259,250,241,232,223,214,205,196,187,178,
 169,160,151,142,134,125,116,107,98,89,80,71,62,53,44,35,26,17,8,0,0};
 
-inline trigonometric sine(uint16_t original_angle){
+inline trigonometric sine_cos(uint16_t original_angle){
 
     uint16_t positive_angle = (original_angle & 0b0111111111111111);
     //TODO - how to calculate the module in a better way in this architecture?
     uint16_t normalized_angle = positive_angle % (360 << 5);
     uint16_t last_angle = normalized_angle;
 
-    //In this code, I changed an angle between 0 and 360 to an angle between 0 and 90
+    //changed an angle between 0 and 360 to an angle between 0 and 90
     if(normalized_angle > (180 << 5))
         last_angle = normalized_angle - (180 << 5);
     if(last_angle > (90 << 5))
         last_angle = (180 << 5) - last_angle;
 
-    //TODO - check if CCES C can use bool variables
     //I want to avoid pipeline breaks, so I'll check in which quadrant the angle is, based on a division by 4
     uint8_t divided = normalized_angle / (90 << 5);
     bool negativeSin = divided>>1;

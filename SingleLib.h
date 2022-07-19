@@ -13,7 +13,8 @@ typedef struct{
     uint16_t cossine_fp;
 }trigonometric;
 
-inline trigonometric sine(uint16_t original_angle);
+//As this function is used just once, it worth to do it as inline
+inline trigonometric sine_cos(uint16_t original_angle);
 
 
 #endif // SINGLELIB_H_INCLUDED
