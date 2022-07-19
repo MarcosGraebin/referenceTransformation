@@ -146,7 +146,7 @@ const uint16_t cos_16[2880] = {32768,32767,32767,32767,32767,32767,32767,32767,3
 696,679,661,643,625,607,589,571,554,536,518,500,482,464,446,428,411,393,375,357,
 339,321,303,285,268,250,232,214,196,178,160,142,125,107,89,71,53,35,17,0};
 
-trigonometric sine(uint16_t original_angle){
+inline trigonometric sine(uint16_t original_angle){
 
     uint16_t positive_angle = (original_angle & 0b0111111111111111);
     //TODO - how to calculate the module in a better way in this architecture?

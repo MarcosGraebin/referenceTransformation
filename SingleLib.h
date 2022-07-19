@@ -17,7 +17,7 @@ typedef struct{
 }trigonometric;
 
 //TODO - will be better if it's an inline function
-trigonometric sine(uint16_t original_angle);
+inline trigonometric sine(uint16_t original_angle);
 
 
 #endif // SINGLELIB_H_INCLUDED
