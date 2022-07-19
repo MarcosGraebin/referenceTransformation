@@ -18,20 +18,22 @@ vector futureMain(vector point, vector translate, uint16_t angle){
     translate.x = (uint16_t) change_to_2_complement(translate.x);
     translate.y = (uint16_t) change_to_2_complement(translate.y);
 
-    trigonometric rotation = sine(angle);
+    trigonometric rotation;
+    rotation = sine(angle);
     rotation.cossine_fp = (uint16_t) change_to_2_complement(rotation.cossine_fp);
     rotation.sine_fp    = (uint16_t) change_to_2_complement(rotation.sine_fp);
-    
+
     point.x = point.x - translate.x;       //Both operations can be done by a single instruction, as in page 45
     point.y = point.y - translate.y;
-    vector to_ret;
-    to_ret.x = point.x*rotation.cossine_fp;    //This four lines can be done by 2 instructions as in page 45 and 611 (multiply and accumulate to accumulator). It'll be nice to use the debugger to check if it's possible to code it without or with the saturation
-    to_ret.y = point.x*rotation.sine_fp;
-    to_ret.x -= point.y*rotation.sine_fp;
-    to_ret.y += point.y*rotation.cossine_fp;
-    
-    //I've tried to generates a code like this for the above block, but it doesn't compile because the sources of the instructions must me the same
-    //So to compile it it would have the same efficency as a C code, because of that, I decided to keep it in C 
+    int32_t a, b;
+    a = (int16_t)point.x*(int16_t)rotation.cossine_fp;
+    a += (int16_t)point.y*(int16_t)rotation.sine_fp;
+    b = (int16_t)point.y*(int16_t)rotation.cossine_fp;
+    b -= (int16_t)point.x*(int16_t)rotation.sine_fp;
+
+    //I've tried to generates a code like this (the rotation direction is inverted) for the above block, but it doesn't compile because the sources of the instructions must me the same
+    //So to compile it it would have the same efficency as a C code, because of that, I decided to keep it in C
+
     /*asm(
         "R0 = %4 -|- %5;"
 
@@ -41,48 +43,39 @@ vector futureMain(vector point, vector translate, uint16_t angle){
         //constraints
         :   "=a"(to_ret.x), "=a"(to_ret.y)
            "+h0"(point.x), "+l0"(point.y)       //input-output operand. With the 0, I'm attribuiting them to the register 0, to do the first instruction
-        :   "h1"(translate.x), "l1"(translate.y), "d"(rotation.cossine_fp), "d"(rotation.sine_fp)   //input operand        
+        :   "h1"(translate.x), "l1"(translate.y), "d"(rotation.cossine_fp), "d"(rotation.sine_fp)   //input operand
     );*/
 
     //The sine and cossine returns values with 14 post-comma bits. It's necessary to eliminate this (even using the multiply and accumulate to accumulator instructions with saturation)
-    //As it has 1 barrel shifter, isn't possible to do both lines at once
-    to_ret.x = to_ret.x >> 14;
-    to_ret.y = to_ret.y >> 14;
+    if(a < 0){
+        a = (0 - a);            //It's possible to use the ABS instructionto do that
+        point.x = a >> 14;
+        point.x |= (1 << 15);      
+    }
+    else
+        point.x = a >> 14;
+    if(b < 0){
+        b = (0 - b);
+        point.y = b >> 14;
+        point.y |= (1 << 15);
+    }
+    else
+        point.y = b >> 14;
 
-    //I'm not sure if this block of code must be here, or above the previous block. It would be nice to test it with a real device
-    if(to_ret.x < 0)
-        to_ret.x = (0 - to_ret.x) | (1 << 15);      //It's possible to use the ABS instruction to the first part of the operation
-    if(to_ret.y < 0)
-        to_ret.y = (0 - to_ret.y) | (1 << 15);
-
-    return to_ret;
+    return point;
 }
 
 int main(){
     vector input, translation;
-    input.x = 0b1000000000000001;
-    input.y = 2;
-    translation.x = 1;
-    translation.y = 2;
+    input.x = (uint16_t)(1 * 32);
+    input.y = (uint16_t)(1 * 32);
+    translation.x = (uint16_t)(1.0 * 32)|(1<<15);
+    translation.y = (uint16_t)(1 * 32);
     trigonometric aux;
 
-    aux = sine((uint16_t) (32768 + (700.9 * 32)));
-
-    int16_t debug_sine = change_to_2_complement(aux.sine_fp);
-    int16_t debug_cos   = change_to_2_complement(aux.cossine_fp);
-
-    float seno = debug_sine / 32768.0, cosseno = debug_cos / 32768.0;
-
-
-
-    //test multiplication of 2 "negative unsigned ints"
-    uint16_t a, b;
-    a = (uint16_t) -1;
-    b = 4;
-    uint16_t c = a * b;
-
+    vector a = futureMain(input, translation, (90<<5));
+    float x = a.x /32.0;
+    float y = a.y / 32.0;
 
     return 0;
-
-    //futureMain(input, translation, 0);
 }
