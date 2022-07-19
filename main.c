@@ -40,7 +40,7 @@ vector futureMain(vector point, vector translate, uint16_t angle){
 
         //constraints
         :   "=a"(to_ret.x), "=a"(to_ret.y)
-        :   "+h0"(point.x), "+l0"(point.y)       //input-output operand. With the 0, I'm attribuiting them to the register 0, to do the first instruction
+           "+h0"(point.x), "+l0"(point.y)       //input-output operand. With the 0, I'm attribuiting them to the register 0, to do the first instruction
         :   "h1"(translate.x), "l1"(translate.y), "d"(rotation.cossine_fp), "d"(rotation.sine_fp)   //input operand        
     );*/
 
