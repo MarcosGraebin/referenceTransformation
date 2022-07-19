@@ -162,8 +162,8 @@ inline trigonometric sine(uint16_t original_angle){
     //TODO - check if CCES C can use bool variables
     //I want to avoid pipeline breaks, so I'll check in which quadrant the angle is, based on a division by 4
     uint8_t divided = normalized_angle / (90 << 5);
-    uint8_t negativeSin = divided>>1;
-    uint8_t negativeCos = (divided & 1) ^ negativeSin;
+    bool negativeSin = divided>>1;
+    bool negativeCos = (divided & 1) ^ negativeSin;
     negativeSin ^= original_angle >> 15;                    //cos(-theta) = cos(theta), sin(-theta) = -sin(theta)
 
     trigonometric to_return;
