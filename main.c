@@ -12,7 +12,8 @@ inline int16_t change_to_2_complement(uint16_t number){
     return number;
 }
 
-vector futureMain(vector point, vector translate, uint16_t angle){
+//The angle input must be in degrees
+vector change_of_reference(vector point, vector translate, uint16_t angle){
 
     point.x     = (uint16_t) change_to_2_complement(point.x);
     point.y     = (uint16_t) change_to_2_complement(point.y);
@@ -26,9 +27,9 @@ vector futureMain(vector point, vector translate, uint16_t angle){
     rotation.sine_fp    = (uint16_t) change_to_2_complement(rotation.sine_fp);
 
     //translate the vector
-    uint32_t aux1, aux2;                //if the sum of the numbers exceeds 16 bits
-    aux1 = point.x - translate.x;       //Both operations can be done by a single instruction, as in page 45
-    aux2 = point.y - translate.y;
+    int32_t aux1, aux2;                //if the sum of the numbers exceeds 16 bits
+    aux1 = (int16_t)point.x - (int16_t)translate.x;       //Both operations can be done by a single instruction, as in page 45
+    aux2 = (int16_t)point.y - (int16_t)translate.y;
 
     //rotate the vector
     int32_t a, b;
@@ -51,9 +52,11 @@ vector futureMain(vector point, vector translate, uint16_t angle){
         :   "h1"(translate.x), "l1"(translate.y), "d"(rotation.cossine_fp), "d"(rotation.sine_fp)   //input operand
     );*/
 
-    //if the result vector is too big
-    if(((uint32_t) a > (1<<30 -1)) || ((uint32_t) b > (1<<30 -1)))
-        return point;
+    //if the result vector is too big or too small
+    if((a > ((1<<(14+14))-1)) || (( b > ((1<<(14+14))-1)) || (a < 0-((1<<(14+14))-1)) || ((b < 0-((1<<(14+14))-1))))){
+        const vector zero = {0,0};
+        return zero;
+    }
 
     //Convert the output to the same format that the input had
     //The sine_cos returns values with 14 post-comma bits. It's necessary to eliminate this
@@ -79,11 +82,11 @@ int main(){     //to test
     vector input, translation;
     input.x = (uint16_t)(1 * 32);
     input.y = (uint16_t)(1 * 32);
-    translation.x = (uint16_t)(1.0 * 32)|(1<<15);
-    translation.y = (uint16_t)(1 * 32);
+    translation.x = (uint16_t)(1.0 * 32)|(1<<15);   //for negative numbers we need set the MSB
+    translation.y = (uint16_t)(1 * 32); 
     trigonometric aux;
 
-    vector a = futureMain(input, translation, (90<<5));
+    vector a = change_of_reference(input, translation, (90<<5));
     float x = a.x /32.0;
     float y = a.y / 32.0;
 
